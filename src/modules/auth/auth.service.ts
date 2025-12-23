@@ -1,22 +1,21 @@
-import jwt from 'jsonwebtoken';
-import { AuthUser } from './auth-user.interface';
-
-const JWT_SECRET = process.env.JWT_SECRET as string;
+import { db } from '../../db';
 
 export class AuthService {
-
-  static generateToken(user: AuthUser): string {
-    return jwt.sign(
-      {
-        id: user.id,
-        role: user.role,
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' }
+  static async findOrCreateUser(phone: string) {
+    const existing = await db.query(
+      'select id, phone, role from users where phone = $1',
+      [phone]
     );
-  }
 
-  static verifyToken(token: string): AuthUser {
-    return jwt.verify(token, JWT_SECRET) as AuthUser;
+    if (existing.rows.length > 0) {
+      return existing.rows[0];
+    }
+
+    const created = await db.query(
+      'insert into users (phone, role) values ($1, $2) returning id, phone, role',
+      [phone, 'CUSTOMER']
+    );
+
+    return created.rows[0];
   }
 }
