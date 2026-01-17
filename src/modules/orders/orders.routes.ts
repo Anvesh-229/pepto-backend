@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { createOrder } from './orders.controller';
-import { updateOrderStatus } from './orders.controller';
+import { createOrder, updateOrderStatus, cancelOrder, getOrderHistory} from './orders.controller';
+
 
 const router = Router();
 
@@ -9,5 +9,11 @@ router.post('/', createOrder);
 
 // Update order status
 router.patch('/:id/status', updateOrderStatus);
+
+//Cancel order and Restore stock
+router.patch('/:id/cancel', cancelOrder);
+
+//GET ORDER HISTORY
+router.get('/history', getOrderHistory);
 
 export default router;
